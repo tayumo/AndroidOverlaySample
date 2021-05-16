@@ -5,10 +5,18 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -25,6 +33,8 @@ public class FilteringService extends Service {
     static final private int NOTIFY_ID = 1;
     private Intent mNotifyIntent;
     private PendingIntent mPendingIntent;
+
+    private WindowManager mWindowManager;
 
     public FilteringService() {
     }
@@ -87,5 +97,24 @@ public class FilteringService extends Service {
 
     private void mainBackGroundProcess() {
         Log.d(TAG,"NOW! start background process");
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+
+        int typeLayer = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+
+        mWindowManager = (WindowManager)getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE);
+
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams (
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                typeLayer,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                PixelFormat.TRANSLUCENT);
+
+        final ViewGroup nullParent = null;
+        View view = layoutInflater.inflate(R.layout.filtering_layer, nullParent);
+        mWindowManager.addView(view, params);
     }
 }
